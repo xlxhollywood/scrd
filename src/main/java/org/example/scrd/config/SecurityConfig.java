@@ -1,7 +1,8 @@
 package org.example.scrd.config;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import org.example.scrd.base.CustomProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.example.scrd.filter.ExceptionHandlerFilter;
 import org.example.scrd.filter.JwtTokenFilter;
 import org.example.scrd.service.AuthService;
@@ -20,20 +21,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
+
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+
 public class SecurityConfig {
 
     private final AuthService authService;
-
-    @Value("${custom.host.client}")
-    private List<String> client;
-
-    @Value("${custom.jwt.secret}")  // properties 파일에서 JWT 서명에 사용할 비밀키를 주입받음
-    private String SECRET_KEY;
+    private final CustomProperties customProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,7 +39,7 @@ public class SecurityConfig {
                 .addFilterBefore(new ExceptionHandlerFilter(), UsernamePasswordAuthenticationFilter.class)
                 // 모든 요청 전에 ExceptionHandlerFilter를 적용하여 발생하는 예외를 처리
                 .addFilterBefore(
-                        new JwtTokenFilter(authService, SECRET_KEY), UsernamePasswordAuthenticationFilter.class)
+                        new JwtTokenFilter(authService, customProperties.getJwtSecret()), UsernamePasswordAuthenticationFilter.class)
                 // JWT 토큰을 인증하기 위한 JwtTokenFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -58,7 +55,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // 허용할 Origin 설정 (ex: 클라이언트 도메인)
-        config.setAllowedOrigins(client);
+        config.setAllowedOrigins(customProperties.getHostClient());
         // 허용할 HTTP 메서드 설정
         config.setAllowedMethods(Arrays.asList("POST", "GET", "PATCH", "DELETE", "PUT"));
         // 요청에 허용할 헤더 설정 (Authorization, Content-Type 등)
