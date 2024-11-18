@@ -1,7 +1,10 @@
-package org.example.config;
+package org.example.scrd.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import org.example.scrd.filter.ExceptionHandlerFilter;
+import org.example.scrd.filter.JwtTokenFilter;
+import org.example.scrd.service.AuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +29,7 @@ public class SecurityConfig {
 
     private final AuthService authService;
 
-    @Value("${custom.host.client}")  // properties 파일에서 CORS 허용 도메인 리스트를 주입받음
+    @Value("${custom.host.client}")
     private List<String> client;
 
     @Value("${custom.jwt.secret}")  // properties 파일에서 JWT 서명에 사용할 비밀키를 주입받음

@@ -13,10 +13,13 @@ spring:
     show-sql: false
     defer-datasource-initialization: true
 
-#  thymeleaf:
-#    prefix: classpath:/templates/
-#    suffix: .html
-#
+custom:
+  host:
+    client: http://localhost:3000
+#  jwt:
+#    secret: "gjITbPwjXp3ZvUfcGx+sxaeB3Mdxcbfur9ZGZkmwgQs="
+#    expiration: 3600000  # JWT 토큰 만료 시간 (1시간)
+
 #kakao:
 #  client:
 #    id: 98d219c4217898cf3c7e2d139e23b5ca
