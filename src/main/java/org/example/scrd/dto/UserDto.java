@@ -12,7 +12,7 @@ public class UserDto {
     private Long id;
     private Long kakaoId;
     private String name;
-    private String phoneNumber;
+    private String email;
     private String profileImageUrl;
     private Integer income;
 
@@ -21,7 +21,7 @@ public class UserDto {
                 .id(user.getId())
                 .kakaoId(user.getKakaoId())
                 .name(user.getName())
-                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
                 .income(user.getIncome())
                 .build();
@@ -34,7 +34,7 @@ public class UserDto {
                     .id(user.getId())
                     .kakaoId(user.getKakaoId())
                     .name(user.getName())
-                    .phoneNumber(user.getPhoneNumber())
+                    .email(user.getEmail())
                     .profileImageUrl(user.getProfileImageUrl())
                     .income(user.getIncome())
                     .build());

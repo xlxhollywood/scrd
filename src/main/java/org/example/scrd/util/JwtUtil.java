@@ -20,7 +20,7 @@ public class JwtUtil {
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰이 발급된 시간 설정
                 .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs)) // 토큰 만료 시간 설정
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 서명 알고리즘과 비밀키를 사용해 서명
-                .compact(); // JWT 토큰을 직렬화하여 반환
+                .compact(); // JWT 토큰을 직렬화하여 반환 = 객체나 데이터를 특정 포맷(예: 문자열)으로 변환하는 것을 의미합니다.
     }
 
     // JWT에서 userId 추출하는 메서드

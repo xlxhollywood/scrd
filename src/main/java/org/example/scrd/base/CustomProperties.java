@@ -11,6 +11,7 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "custom")
 public class CustomProperties {
+
     private List<String> hostClient;
     private String jwtSecret;
 

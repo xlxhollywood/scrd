@@ -1,4 +1,4 @@
-package org.example.scrd.response;
+package org.example.scrd.controller.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,5 +9,5 @@ public class KakaoLoginResponse {
     private String accessToken;
     private String name;
     private String profileImageUrl;
-    private String phoneNumber;
+    private String email;
 }

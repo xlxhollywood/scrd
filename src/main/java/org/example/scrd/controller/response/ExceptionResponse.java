@@ -1,4 +1,4 @@
-package org.example.scrd.response;
+package org.example.scrd.controller.response;
 
 import lombok.Builder;
 import lombok.Getter;

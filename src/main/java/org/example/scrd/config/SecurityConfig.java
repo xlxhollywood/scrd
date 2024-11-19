@@ -2,7 +2,6 @@ package org.example.scrd.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.scrd.base.CustomProperties;
-import org.springframework.beans.factory.annotation.Value;
 import org.example.scrd.filter.ExceptionHandlerFilter;
 import org.example.scrd.filter.JwtTokenFilter;
 import org.example.scrd.service.AuthService;
@@ -44,7 +43,7 @@ public class SecurityConfig {
                 .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/ssobbi/auth/**", "/error","/").permitAll())
+                        request -> request.requestMatchers("/api/scrd/auth/**", "/error" , "/").permitAll())
                 .authorizeHttpRequests(
                         request -> request.requestMatchers("/api/ssobbi/**").authenticated());
         return http.build();

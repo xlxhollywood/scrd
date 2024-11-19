@@ -1,15 +1,14 @@
 package org.example.scrd.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.scrd.dto.UserDto;
 
 @Entity
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +21,8 @@ public class User {
     private String name;
 
     @Setter
-    @Column(columnDefinition = "varchar(20)")
-    private String phoneNumber;
+    @Column(columnDefinition = "varchar(30)")
+    private String email;
 
     @Setter
     @Column(columnDefinition = "varchar(500)")
@@ -36,7 +35,7 @@ public class User {
         return User.builder()
                 .kakaoId(dto.getKakaoId())
                 .name(dto.getName())
-                .phoneNumber(dto.getPhoneNumber())
+                .email(dto.getEmail())
                 .profileImageUrl(dto.getProfileImageUrl())
                 .income(dto.getIncome())
                 .build();

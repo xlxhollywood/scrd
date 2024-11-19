@@ -12,6 +12,11 @@ spring:
         format_sql: true
     show-sql: false
     defer-datasource-initialization: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
 
 custom:
   host:
@@ -20,4 +25,12 @@ custom:
       - http://example.com
   jwt:
     secret: "gjITbPwjXp3ZvUfcGx+sxaeB3Mdxcbfur9ZGZkmwgQs="
-    expiration: 3600000  # JWT 토큰 만료 시간 (1시간)
+    expire-time-ms: 3600000  # 만료 시간 설정 (1시간)
+
+kakao:
+  api:
+    key:
+      client: "6b4d8cc48ec73499504d519e26c84c91"  # 클라이언트 키
+    auth-url: "https://kauth.kakao.com/oauth/authorize"
+    redirect-uri: "http://localhost:8080/api/scrd/auth/kakao-login"
+

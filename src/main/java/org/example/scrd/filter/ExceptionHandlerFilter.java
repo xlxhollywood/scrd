@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import lombok.NonNull;
-import org.example.scrd.base.ExceptionResponse;
+import org.example.scrd.controller.response.ExceptionResponse;
 import org.example.scrd.exception.DoNotLoginException;
 import org.example.scrd.exception.WrongTokenException;
 import org.springframework.http.HttpStatus;

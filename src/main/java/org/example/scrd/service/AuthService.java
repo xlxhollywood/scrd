@@ -21,6 +21,7 @@ public class AuthService {
                 userRepository
                         .findByKakaoId(dto.getKakaoId()) // 카카오 ID로 사용자를 조회
                         .orElseGet(() -> userRepository.save(User.from(dto))); // 없으면 새로운 사용자 저장
+        user.setEmail(dto.getEmail());
         user.setProfileImageUrl(dto.getProfileImageUrl());  // 프로필 이미지를 업데이트
         user.setName(dto.getName());  // 이름 업데이트
 
