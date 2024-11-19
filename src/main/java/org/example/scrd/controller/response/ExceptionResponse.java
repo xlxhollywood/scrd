@@ -1,4 +1,4 @@
-package org.example.scrd.base;
+package org.example.scrd.response;
 
 import lombok.Builder;
 import lombok.Getter;
