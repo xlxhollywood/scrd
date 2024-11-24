@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         request -> request.requestMatchers("/api/scrd/auth/**", "/error" , "/").permitAll())
                 .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/ssobbi/**").authenticated());
+                        request -> request.requestMatchers("/api/scrd/**").authenticated());
         return http.build();
     }
 

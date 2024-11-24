@@ -54,7 +54,6 @@ public class KakaoService {
                 String.class
         );
 
-        System.out.println("reponse = " + response);
 
         // HTTP 응답 (JSON)에서 액세스 토큰 파싱
         String responseBody = response.getBody();
@@ -88,7 +87,7 @@ public class KakaoService {
                 String.class
         );
 
-        System.out.println("reponse2" + response.getBody());
+
         // 응답 본문에서 사용자 정보를 파싱
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();

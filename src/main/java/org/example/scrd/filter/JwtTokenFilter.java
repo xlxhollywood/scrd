@@ -47,7 +47,6 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
             System.out.println("token 필터 - 요청 URI: " + request.getRequestURI() + " (JWT 검증 시작)");
             // HTTP 요청의 Authorization 헤더에서 JWT 토큰을 추출
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
             // Header의 Authorization 값이 비어있으면 => Jwt Token을 전송하지 않음 => 로그인 하지 않음
             if (authorizationHeader == null) throw new DoNotLoginException();
 
@@ -57,7 +56,6 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
 
             // 전송받은 값에서 'Bearer ' 뒷부분(Jwt Token) 추출
             String token = authorizationHeader.split(" ")[1];
-
             // 토큰에서 userId를 추출한 뒤 해당 사용자의 정보를 가져옴
             User loginUser = authService.getLoginUser(JwtUtil.getUserId(token, SECRET_KEY));
 
@@ -74,8 +72,9 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
             // 필터 체인의 다음 단계로 요청을 전달
-            System.out.println("찍히나?");
             filterChain.doFilter(request, response);
 
     }
+
+
 }

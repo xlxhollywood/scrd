@@ -18,6 +18,12 @@ spring:
     mode: HTML
     cache: false
 
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
 custom:
   host:
     client:
@@ -33,4 +39,3 @@ kakao:
       client: "6b4d8cc48ec73499504d519e26c84c91"  # 클라이언트 키
     auth-url: "https://kauth.kakao.com/oauth/authorize"
     redirect-uri: "http://localhost:8080/api/scrd/auth/kakao-login"
-

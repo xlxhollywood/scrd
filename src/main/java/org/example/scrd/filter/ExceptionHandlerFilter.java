@@ -24,7 +24,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            // 요청을 처리하는 필터 체인을 실행
+            // 요청을 처리하는 필터 체인을 실행 try/ catch 문이므로 jwt 토큰에서 예외가 발생하면 이 필터에서 예외처리를 해줄 것이다.
             filterChain.doFilter(request, response);
         } catch (DoNotLoginException e) {
             // 로그인하지 않았을 경우 발생하는 예외 처리 (ex: 토큰이 없는 경우)

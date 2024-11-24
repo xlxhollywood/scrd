@@ -9,10 +9,11 @@ import org.example.scrd.service.KakaoService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,8 +32,6 @@ public class AuthController {
     // 카카오 로그인을 처리하는 엔드포인트 코드를 받자마자 GetMapping 호출됨
     @GetMapping("/api/scrd/auth/kakao-login")
     public ResponseEntity<KakaoLoginResponse> kakaoLogin(@RequestParam String code, HttpServletRequest request) {
-        System.out.println(code);
-        System.out.println("request" + request);
         // 카카오 로그인 과정: 카카오에서 인증 코드를 받아 사용자의 정보를 가져옴
         // code = token
         UserDto userDto = authService.kakaoLogin(
@@ -40,13 +39,51 @@ public class AuthController {
 
         // 가져온 사용자 정보로 JWT 토큰을 생성
         String jwtToken = JwtUtil.createToken(userDto.getId(), SECRET_KEY, EXPIRE_TIME_MS);
+        System.out.println("Authentication after setting: " + SecurityContextHolder.getContext().getAuthentication());
+
 
         return ResponseEntity.ok(
-                KakaoLoginResponse.builder()
+                KakaoLoginResponse.builder() // 리스폰스 객체에다가 JWT 토큰 감싸서 주고 있음.
                         .accessToken(jwtToken)  // 생성한 JWT 토큰
                         .name(userDto.getName())  // 사용자의 이름
                         .profileImageUrl(userDto.getProfileImageUrl()) // 사용자의 프로필 이미지 URL
                         .email(userDto.getEmail()) // 사용자의 전화번호
                         .build());
+
     }
+
+    @GetMapping("/api/scrd/auth/user")
+    public ResponseEntity<String> validateJwtToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        System.out.println("파라미터 값 : " + request);
+        System.out.println("Authorization Header: " + authorizationHeader);
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body("Missing or invalid Authorization header");
+        }
+
+        String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 추출
+
+        try {
+            // 토큰에서 사용자 ID를 추출하고 검증
+            Long userId = JwtUtil.getUserId(token, SECRET_KEY);
+            authService.getLoginUser(userId); // 사용자 검증 로직
+
+            return ResponseEntity.ok("Token is valid. User ID: " + userId);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Invalid token: " + e.getMessage());
+        }
+    }
+
+        @GetMapping("/api/scrd/user2")
+        public ResponseEntity<String> getCurrentUserId(@AuthenticationPrincipal Long userId) {
+            System.out.println("Authentication after setting: " + SecurityContextHolder.getContext().getAuthentication());
+            if (userId == null) {
+                return ResponseEntity.status(401).body("Unauthorized: No user ID available.");
+            }
+
+            return ResponseEntity.ok("Authenticated User ID: " + userId);
+        }
+
+
 }
