@@ -29,7 +29,8 @@ custom:
     client: http://localhost:3000,https://elegant-puppy-7c8193.netlify.app/
   jwt:
     secret: "gjITbPwjXp3ZvUfcGx+sxaeB3Mdxcbfur9ZGZkmwgQs="
-    expire-time-ms: 3600000  # 만료 시간 설정 (1시간)
+    expire-time-ms:  10000 # 만료 시간 설정 (1시간) = 3600000
+    refresh-expire-time-ms: 20000
 
 kakao:
   api:

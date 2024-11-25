@@ -4,23 +4,43 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.example.scrd.domain.Token;
 import org.example.scrd.exception.WrongTokenException;
 
 import java.util.Date;
 public class JwtUtil {
-    public static String createToken(Long userId, String secretKey, long expireTimeMs) {
+    public static Token createToken(Long userId, String secretKey, long expireTimeMs, long expireRefreshTimeMs ) {
         // JWT의 payload에 해당하는 Claims에 데이터를 추가
         // Claim = JWT 토큰의 payload에 저장될 정보. 여기서는 userId를 저장함.
         Claims claims = Jwts.claims();
         claims.put("userId", userId); // 사용자 ID를 Claim에 넣음
 
-        // JWT 토큰을 생성
-        return Jwts.builder()
-                .setClaims(claims)// 사용자 ID가 포함된 Claim 설정
-                .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰이 발급된 시간 설정
-                .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs)) // 토큰 만료 시간 설정
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 서명 알고리즘과 비밀키를 사용해 서명
-                .compact(); // JWT 토큰을 직렬화하여 반환 = 객체나 데이터를 특정 포맷(예: 문자열)으로 변환하는 것을 의미합니다.
+        //Access Token 발급
+        String accessToken = Jwts.builder()
+                .setClaims(claims) // 정보 저장
+                .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 발행 시간 정보
+                .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs)) // set Expire Time
+                .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
+                .compact();
+
+        // TODO : Refresh Token 발급
+        String refreshToken =  Jwts.builder()
+                .setClaims(claims) // 정보 저장
+                .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 발행 시간 정보
+                .setExpiration(new Date(System.currentTimeMillis() + expireRefreshTimeMs)) // set Expire Time
+                .signWith(SignatureAlgorithm.HS256, secretKey)   // 사용할 암호화 알고리즘과
+                .compact();
+
+        // TODO : Refresh Token Redis에 저장해야함
+
+
+        // 액세스, 리프레쉬가 들어가 있는 토큰 객체를 반환
+        return
+            Token.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .key(userId)
+                    .build();
     }
 
     // JWT에서 userId 추출하는 메서드
