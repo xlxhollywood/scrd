@@ -1,7 +1,6 @@
 package org.example.scrd.controller;
 
 
-import org.example.scrd.domain.Token;
 import org.example.scrd.util.JwtUtil;
 import org.example.scrd.dto.UserDto;
 import org.example.scrd.controller.response.KakaoLoginResponse;
@@ -14,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -21,6 +22,8 @@ public class AuthController {
     private final AuthService authService; // 사용자 인증 관련 서비스
 
     private final KakaoService kakaoService; // 카카오 API와 통신하는 서비스
+
+    private final JwtUtil jwtUtil;
 
     @Value("${custom.jwt.secret}") // application properties에서 JWT 비밀키를 주입받음
     private String SECRET_KEY;
@@ -44,13 +47,14 @@ public class AuthController {
                         kakaoService.kakaoLogin(code,request.getHeader("Origin")+"/login/oauth/kakao"));
 
         // 가져온 사용자 정보로 JWT 토큰을 생성
-        Token jwtToken = JwtUtil.createToken(userDto.getId(), SECRET_KEY, EXPIRE_TIME_MS, EXPIRE_REFRESH_TIME_MS);
+        List<String> jwtToken = jwtUtil.createToken(userDto.getId(), SECRET_KEY, EXPIRE_TIME_MS, EXPIRE_REFRESH_TIME_MS);
         System.out.println("Authentication after setting: " + SecurityContextHolder.getContext().getAuthentication());
 
 
         return ResponseEntity.ok(
                 KakaoLoginResponse.builder() // 리스폰스 객체에다가 JWT 토큰 감싸서 주고 있음.
-                        .token(jwtToken)  // 생성한 JWT 토큰
+                        .accessToken(jwtToken.get(0))  // 생성한 JWT 액세스 토큰
+                        .refreshToken(jwtToken.get(1)) // 생성한 JWT 리프레쉬 토큰
                         .name(userDto.getName())  // 사용자의 이름
                         .profileImageUrl(userDto.getProfileImageUrl()) // 사용자의 프로필 이미지 URL
                         .email(userDto.getEmail()) // 사용자의 전화번호

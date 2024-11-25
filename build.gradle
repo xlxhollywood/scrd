@@ -33,6 +33,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Jackson을 사용해 JSON을 처리
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'

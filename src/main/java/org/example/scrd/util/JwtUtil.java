@@ -4,12 +4,23 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.example.scrd.domain.Token;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.scrd.domain.RefreshToken;
 import org.example.scrd.exception.WrongTokenException;
+import org.example.scrd.repo.RefreshTokenRepository;
+import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+@Slf4j
+@RequiredArgsConstructor
+@Component
 public class JwtUtil {
-    public static Token createToken(Long userId, String secretKey, long expireTimeMs, long expireRefreshTimeMs ) {
+
+    private final RefreshTokenRepository refreshTokenRepository;
+    public List<String> createToken(Long userId, String secretKey, long expireTimeMs, long expireRefreshTimeMs ) {
         // JWT의 payload에 해당하는 Claims에 데이터를 추가
         // Claim = JWT 토큰의 payload에 저장될 정보. 여기서는 userId를 저장함.
         Claims claims = Jwts.claims();
@@ -32,15 +43,11 @@ public class JwtUtil {
                 .compact();
 
         // TODO : Refresh Token Redis에 저장해야함
-
+        RefreshToken redis = new RefreshToken(refreshToken, userId);
+        refreshTokenRepository.save(redis);
 
         // 액세스, 리프레쉬가 들어가 있는 토큰 객체를 반환
-        return
-            Token.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .key(userId)
-                    .build();
+        return Arrays.asList(accessToken, refreshToken);
     }
 
     // JWT에서 userId 추출하는 메서드
