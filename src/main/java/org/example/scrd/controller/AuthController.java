@@ -30,12 +30,17 @@ public class AuthController {
     private long EXPIRE_TIME_MS;
 
     // 카카오 로그인을 처리하는 엔드포인트 코드를 받자마자 GetMapping 호출됨
-    @GetMapping("/api/scrd/auth/kakao-login")
+    // http://localhost:8080/scrd/auth/kakao-login"
+    @GetMapping("/scrd/auth/kakao-login")
     public ResponseEntity<KakaoLoginResponse> kakaoLogin(@RequestParam String code, HttpServletRequest request) {
         // 카카오 로그인 과정: 카카오에서 인증 코드를 받아 사용자의 정보를 가져옴
         // code = token
-        UserDto userDto = authService.kakaoLogin(
-                kakaoService.kakaoLogin(code));
+        System.out.println("호출됨");
+        System.out.println("code : " + code);
+        System.out.println("Header : " + request.getHeader("Origin")+"/login/oauth/kakao");
+        UserDto userDto =
+                authService.kakaoLogin(
+                        kakaoService.kakaoLogin(code,request.getHeader("Origin")+"/login/oauth/kakao"));
 
         // 가져온 사용자 정보로 JWT 토큰을 생성
         String jwtToken = JwtUtil.createToken(userDto.getId(), SECRET_KEY, EXPIRE_TIME_MS);
@@ -52,7 +57,7 @@ public class AuthController {
 
     }
 
-    @GetMapping("/api/scrd/auth/user")
+    @GetMapping("/scrd/auth/user")
     public ResponseEntity<String> validateJwtToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         System.out.println("파라미터 값 : " + request);

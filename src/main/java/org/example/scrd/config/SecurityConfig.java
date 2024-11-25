@@ -35,6 +35,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults()) // 기본 CORS 설정 적용
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화 (JWT를 사용하므로 필요 없음)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new ExceptionHandlerFilter(), UsernamePasswordAuthenticationFilter.class)
                 // 모든 요청 전에 ExceptionHandlerFilter를 적용하여 발생하는 예외를 처리
                 .addFilterBefore(
@@ -42,10 +43,11 @@ public class SecurityConfig {
                 // JWT 토큰을 인증하기 위한 JwtTokenFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/scrd/auth/**", "/error" , "/").permitAll())
-                .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/scrd/**").authenticated());
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/scrd/auth/**", "/error" ,"/").permitAll()
+                        .requestMatchers("/scrd/every/**").permitAll()
+                        .requestMatchers("/scrd/api/**").authenticated() // 인증된 사용자만
+                );
         return http.build();
     }
 

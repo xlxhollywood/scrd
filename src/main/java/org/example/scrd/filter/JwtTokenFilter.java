@@ -34,17 +34,14 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
 
         // "/error" 및 "/api/ssobbi/auth/"로 시작하는 요청은 JWT 검증 없이 필터를 통과시킴
         if (request.getRequestURI().startsWith("/error") ||
-                request.getRequestURI().startsWith("/api/scrd/auth/") ||
+                request.getRequestURI().startsWith("/scrd/auth/") ||
+                request.getRequestURI().startsWith("/scrd/every") ||
                 request.getRequestURI().equals("/")
         ) {
-            System.out.println("token 필터 - 요청 URI입니다: " + request.getRequestURI());
             filterChain.doFilter(request, response);  // 여기가 올바르게 작동하고 있습니다.
             return;  // 이 부분을 통해 바로 반환
-
         }
 
-
-            System.out.println("token 필터 - 요청 URI: " + request.getRequestURI() + " (JWT 검증 시작)");
             // HTTP 요청의 Authorization 헤더에서 JWT 토큰을 추출
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             // Header의 Authorization 값이 비어있으면 => Jwt Token을 전송하지 않음 => 로그인 하지 않음

@@ -12,7 +12,7 @@ import org.example.scrd.dto.UserDto;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     private Long kakaoId;
 
@@ -25,19 +25,20 @@ public class User {
     private String email;
 
     @Setter
-    @Column(columnDefinition = "varchar(500)")
+    @Column(columnDefinition = "TEXT")
     private String profileImageUrl;
 
-    @Setter
-    private Integer income;
+    private String tier;
+    private String gender;
+    private String birth;
 
+    // ***추후 성별, 생일 받으면 빌더 타입 수정해야함.
     public static User from(UserDto dto){
         return User.builder()
                 .kakaoId(dto.getKakaoId())
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .profileImageUrl(dto.getProfileImageUrl())
-                .income(dto.getIncome())
                 .build();
     }
 

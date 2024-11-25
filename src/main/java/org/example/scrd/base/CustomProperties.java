@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "custom")
 public class CustomProperties {
-
+    @Value("${custom.host.client}")
     private List<String> hostClient;
     @Value("${custom.jwt.secret}")
     private String jwtSecret;

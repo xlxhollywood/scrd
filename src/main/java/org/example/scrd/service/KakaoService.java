@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.HashMap;
 
@@ -20,14 +23,16 @@ import java.util.HashMap;
 public class KakaoService {
     @Value("${kakao.api.key.client}") // application properties에서 카카오 클라이언트 ID 주입
     private String clientId;
-    @Value("${kakao.api.redirect-uri}")
-    private String redirectUri;
+
+//    @Value("${kakao.api.redirect-uri}")
+//    private String redirectUri;
+    private static final Logger logger = LoggerFactory.getLogger(KakaoService.class);
 
 
 
-    public UserDto kakaoLogin(String code) {
-        String accessToken = getAccessToken(code, redirectUri); // 액세스 토큰을 먼저 받아옴
-        return getKakaoUserInfo(accessToken);  // 받은 액세스 토큰으로 사용자 정보 조회
+    public UserDto kakaoLogin(String code , String redirectUri) {
+        String accessToken = getAccessToken(code, redirectUri); // 응답 받은 code로부터 accessToken 받아내기
+        return getKakaoUserInfo(accessToken); // accessToken으로부터 사용자 정보 알아내기
     }
     // 카카오 OAuth 서버에서 액세스 토큰을 받아오는 메서드
     private String getAccessToken(String code, String redirectUri) {
@@ -45,6 +50,11 @@ public class KakaoService {
 
         // HTTP 요청 생성
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
+
+        // 디버깅 로그 추가
+        logger.info("Headers: {}", headers);
+        logger.info("Body: {}", body);
+
         // 카카오 서버로 HTTP 요청을 보내고 액세스 토큰을 받아옴
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
@@ -53,7 +63,6 @@ public class KakaoService {
                 kakaoTokenRequest,
                 String.class
         );
-
 
         // HTTP 응답 (JSON)에서 액세스 토큰 파싱
         String responseBody = response.getBody();
@@ -87,7 +96,7 @@ public class KakaoService {
                 String.class
         );
 
-
+        System.out.println("hi");
         // 응답 본문에서 사용자 정보를 파싱
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();

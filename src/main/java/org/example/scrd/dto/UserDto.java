@@ -14,8 +14,11 @@ public class UserDto {
     private String name;
     private String email;
     private String profileImageUrl;
-    private Integer income;
+    private String tier;
+    private String gender;
+    private String birth;
 
+    // ***추후 성별, 생일 받으면 빌더 타입 수정해야함.
     public static UserDto from(User user) {
         return UserDto.builder()
                 .id(user.getId())
@@ -23,7 +26,6 @@ public class UserDto {
                 .name(user.getName())
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
-                .income(user.getIncome())
                 .build();
     }
 
@@ -36,7 +38,6 @@ public class UserDto {
                     .name(user.getName())
                     .email(user.getEmail())
                     .profileImageUrl(user.getProfileImageUrl())
-                    .income(user.getIncome())
                     .build());
         }
         return userDtos;
