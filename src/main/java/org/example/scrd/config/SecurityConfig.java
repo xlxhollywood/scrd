@@ -5,6 +5,7 @@ import org.example.scrd.base.CustomProperties;
 import org.example.scrd.filter.ExceptionHandlerFilter;
 import org.example.scrd.filter.JwtTokenFilter;
 import org.example.scrd.service.AuthService;
+import org.example.scrd.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +31,7 @@ public class SecurityConfig {
 
     private final AuthService authService;
     private final CustomProperties customProperties;
+    private final JwtUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,7 +41,8 @@ public class SecurityConfig {
                 .addFilterBefore(new ExceptionHandlerFilter(), UsernamePasswordAuthenticationFilter.class)
                 // 모든 요청 전에 ExceptionHandlerFilter를 적용하여 발생하는 예외를 처리
                 .addFilterBefore(
-                        new JwtTokenFilter(authService, customProperties.getJwtSecret()), UsernamePasswordAuthenticationFilter.class)
+                        new JwtTokenFilter(authService, customProperties.getJwtSecret(), jwtUtil),
+                        UsernamePasswordAuthenticationFilter.class)
                 // JWT 토큰을 인증하기 위한 JwtTokenFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
