@@ -29,6 +29,7 @@ public class JwtUtil {
         //Access Token 발급
         String accessToken = Jwts.builder()
                 .setClaims(claims) // 정보 저장
+                .claim("tokenType", "ACCESS") // 토큰 타입 추가
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 발행 시간 정보
                 .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
@@ -37,6 +38,7 @@ public class JwtUtil {
         // TODO : Refresh Token 발급
         String refreshToken =  Jwts.builder()
                 .setClaims(claims) // 정보 저장
+                .claim("tokenType", "REFRESH") // 토큰 타입 추가
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 토큰 발행 시간 정보
                 .setExpiration(new Date(System.currentTimeMillis() + expireRefreshTimeMs)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)   // 사용할 암호화 알고리즘과
@@ -52,8 +54,8 @@ public class JwtUtil {
 
     // JWT에서 userId 추출하는 메서드
     public static Long getUserId(String token, String secretKey) {
-        // 토큰에서 Claim을 추출하고 userId를 반환
-        return extractClaims(token, secretKey).get("userId", Long.class);
+            // 토큰에서 Claim을 추출하고 userId를 반환
+            return extractClaims(token, secretKey).get("userId", Long.class);
     }
 
     // SecretKey를 사용해 Token을 검증하고, Claim을 추출하는 메서드
@@ -65,8 +67,9 @@ public class JwtUtil {
                     .parseClaimsJws(token) // 토큰을 파싱하고 유효성 검사를 수행
                     .getBody(); // 유효한 경우 토큰의 본문(Claim)을 반환
         } catch (ExpiredJwtException e) {
-            // 만료된 토큰의 경우 예외를 발생시킴
+            // TODO: 만료된 액세스 토큰일 경우, refresh token을 서버에게 전달 , 서버는 refresh token을 검증
             throw new WrongTokenException("만료된 토큰입니다.");
+
         }
     }
 }

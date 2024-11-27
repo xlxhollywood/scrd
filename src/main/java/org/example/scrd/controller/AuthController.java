@@ -1,6 +1,7 @@
 package org.example.scrd.controller;
 
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.scrd.util.JwtUtil;
 import org.example.scrd.dto.UserDto;
 import org.example.scrd.controller.response.KakaoLoginResponse;
@@ -36,30 +37,35 @@ public class AuthController {
     // 카카오 로그인을 처리하는 엔드포인트 코드를 받자마자 GetMapping 호출됨
     // http://localhost:8080/scrd/auth/kakao-login"
     @GetMapping("/scrd/auth/kakao-login")
-    public ResponseEntity<KakaoLoginResponse> kakaoLogin(@RequestParam String code, HttpServletRequest request) {
-        // 카카오 로그인 과정: 카카오에서 인증 코드를 받아 사용자의 정보를 가져옴
-        // code = token
+    public ResponseEntity<KakaoLoginResponse> kakaoLogin(
+            @RequestParam String code,
+            HttpServletRequest request,
+            HttpServletResponse response) { // HttpServletResponse 추가
+
+        // 카카오 로그인 과정
         System.out.println("호출됨");
         System.out.println("code : " + code);
-        System.out.println("Header : " + request.getHeader("Origin")+"/login/oauth/kakao");
+        System.out.println("Header : " + request.getHeader("Origin") + "/login/oauth/kakao");
         UserDto userDto =
                 authService.kakaoLogin(
-                        kakaoService.kakaoLogin(code,request.getHeader("Origin")+"/login/oauth/kakao"));
+                        kakaoService.kakaoLogin(code, request.getHeader("Origin") + "/login/oauth/kakao"));
 
-        // 가져온 사용자 정보로 JWT 토큰을 생성
+        // JWT 토큰 생성
         List<String> jwtToken = jwtUtil.createToken(userDto.getId(), SECRET_KEY, EXPIRE_TIME_MS, EXPIRE_REFRESH_TIME_MS);
         System.out.println("Authentication after setting: " + SecurityContextHolder.getContext().getAuthentication());
 
+        // TODO: 액세스 토큰을 Authorization 헤더에 추가
+        response.setHeader("Authorization", "Bearer " + jwtToken.get(0));
 
+        // TODO: 액세스 토큰을 Authorization 헤더에 추가
+        response.setHeader("X-Refresh-Token", jwtToken.get(1));
+
+        // 응답 본문에 JWT 토큰 및 사용자 정보 추가
         return ResponseEntity.ok(
-                KakaoLoginResponse.builder() // 리스폰스 객체에다가 JWT 토큰 감싸서 주고 있음.
-                        .accessToken(jwtToken.get(0))  // 생성한 JWT 액세스 토큰
-                        .refreshToken(jwtToken.get(1)) // 생성한 JWT 리프레쉬 토큰
-                        .name(userDto.getName())  // 사용자의 이름
-                        .profileImageUrl(userDto.getProfileImageUrl()) // 사용자의 프로필 이미지 URL
-                        .email(userDto.getEmail()) // 사용자의 전화번호
+                KakaoLoginResponse.builder()
+                        .name(userDto.getName())
+                        .profileImageUrl(userDto.getProfileImageUrl())
+                        .email(userDto.getEmail())
                         .build());
-
     }
-
 }
