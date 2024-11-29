@@ -46,14 +46,14 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             // TODO: refresh token 헤더 검증
             String refreshToken = null;
+            // refreshToken = null이 아니거나, 비어있지 않다면 검증
             if (request.getHeader("X-Refresh-Token") != null && !request.getHeader("X-Refresh-Token").isEmpty()) {
-            String refreshTokenHeader = request.getHeader("X-Refresh-Token");
-            if (refreshTokenHeader.startsWith("Bearer ")) {
-                refreshToken = refreshTokenHeader.substring(7); // Bearer 이후의 값 추출
-                }
+                // X-Refresh-Token 헤더에서 리프레시 토큰 값을 바로 가져옴
+                refreshToken = request.getHeader("X-Refresh-Token");
             }
 
-            // Header의 Authorization 값이 비어있으면 => Jwt Token을 전송하지 않음 => 로그인 하지 않음
+
+        // Header의 Authorization 값이 비어있으면 => Jwt Token을 전송하지 않음 => 로그인 하지 않음
             if (authorizationHeader == null) throw new DoNotLoginException();
 
             // Header의 Authorization 값이 'Bearer '로 시작하지 않으면 => 잘못된 토큰
@@ -87,7 +87,8 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
 
                 // TODO: 응답 헤더에 access token, refresh token을 심어준다.
                 response.setHeader("Authorization", "Bearer " + newTokens.get(0)); // Access Token
-                response.setHeader("X-Refresh-Token", newTokens.get(1));          // Refresh Token
+                response.setHeader("X-Refresh-Token", newTokens.get(1));
+
 
                 // TODO: User 객체에 새로운 액세스 토큰으로 ID 찾아오기
                 User loginUser = authService.getLoginUser(JwtUtil.getUserId(newTokens.get(0),SECRET_KEY));

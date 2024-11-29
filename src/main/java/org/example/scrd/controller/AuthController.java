@@ -42,23 +42,18 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) { // HttpServletResponse 추가
 
-        // 카카오 로그인 과정
-        System.out.println("호출됨");
-        System.out.println("code : " + code);
-        System.out.println("Header : " + request.getHeader("Origin") + "/login/oauth/kakao");
         UserDto userDto =
                 authService.kakaoLogin(
                         kakaoService.kakaoLogin(code, request.getHeader("Origin") + "/login/oauth/kakao"));
 
         // JWT 토큰 생성
         List<String> jwtToken = jwtUtil.createToken(userDto.getId(), SECRET_KEY, EXPIRE_TIME_MS, EXPIRE_REFRESH_TIME_MS);
-        System.out.println("Authentication after setting: " + SecurityContextHolder.getContext().getAuthentication());
 
         // TODO: 액세스 토큰을 Authorization 헤더에 추가
         response.setHeader("Authorization", "Bearer " + jwtToken.get(0));
 
         // TODO: 액세스 토큰을 Authorization 헤더에 추가
-        response.setHeader("X-Refresh-Token", jwtToken.get(1));
+        response.setHeader("X-Refresh-Token",  jwtToken.get(1));
 
         // 응답 본문에 JWT 토큰 및 사용자 정보 추가
         return ResponseEntity.ok(

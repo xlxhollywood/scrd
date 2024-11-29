@@ -21,14 +21,9 @@ import java.util.HashMap;
 
 @Service
 public class KakaoService {
+
     @Value("${kakao.api.key.client}") // application properties에서 카카오 클라이언트 ID 주입
     private String clientId;
-
-//    @Value("${kakao.api.redirect-uri}")
-//    private String redirectUri;
-    private static final Logger logger = LoggerFactory.getLogger(KakaoService.class);
-
-
 
     public UserDto kakaoLogin(String code , String redirectUri) {
         String accessToken = getAccessToken(code, redirectUri); // 응답 받은 code로부터 accessToken 받아내기
@@ -51,9 +46,6 @@ public class KakaoService {
         // HTTP 요청 생성
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
 
-        // 디버깅 로그 추가
-        logger.info("Headers: {}", headers);
-        logger.info("Body: {}", body);
 
         // 카카오 서버로 HTTP 요청을 보내고 액세스 토큰을 받아옴
         RestTemplate rt = new RestTemplate();
@@ -96,7 +88,6 @@ public class KakaoService {
                 String.class
         );
 
-        System.out.println("hi");
         // 응답 본문에서 사용자 정보를 파싱
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();

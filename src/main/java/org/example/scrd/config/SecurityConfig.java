@@ -59,18 +59,22 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // 허용할 Origin 설정 (ex: 클라이언트 도메인)
-        config.setAllowedOrigins(customProperties.getHostClient());
+        config.setAllowedOrigins(customProperties.getHostClient()); // 클라이언트 도메인
         // 허용할 HTTP 메서드 설정
         config.setAllowedMethods(Arrays.asList("POST", "GET", "PATCH", "DELETE", "PUT"));
         // 요청에 허용할 헤더 설정 (Authorization, Content-Type 등)
         config.setAllowedHeaders(Arrays.asList(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE));
+        // 노출할 헤더 설정 (클라이언트에서 접근 가능한 헤더)
+        config.setExposedHeaders(Arrays.asList(HttpHeaders.AUTHORIZATION, "X-Refresh-Token"));
         // 인증 정보를 포함한 요청(Cookie 등)을 허용할지 여부 설정
         config.setAllowCredentials(true);
+
         // 특정 경로에 대해 CORS 설정 적용
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config); // 모든 경로에 대해 설정 적용
         return source; // CORS 설정 반환
     }
+
 
 
 }
