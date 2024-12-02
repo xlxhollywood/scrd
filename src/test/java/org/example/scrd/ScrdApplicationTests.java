@@ -12,7 +12,27 @@ public class ScrdApplicationTests {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+    @Test
+    void findRefreshTokenById() {
+        // 1. 테스트용 데이터 저장
+        String refreshTokenValue = "testRefreshToken";
+        Long userId = 1245L;
+        RefreshToken token = new RefreshToken(refreshTokenValue, userId);
 
+        refreshTokenRepository.save(token);
+
+        // 2. 저장된 데이터 조회
+        RefreshToken retrievedToken = refreshTokenRepository.findById(refreshTokenValue).orElse(null);
+
+        // 3. 데이터 검증
+        Assertions.assertNotNull(retrievedToken, "저장된 토큰은 null이 아니어야 합니다.");
+        Assertions.assertEquals(userId, retrievedToken.getUserId(), "User ID가 일치해야 합니다.");
+        Assertions.assertEquals(refreshTokenValue, retrievedToken.getRefreshToken(), "Refresh Token 값이 일치해야 합니다.");
+
+        // 4. 결과 출력
+        System.out.println("조회된 토큰 값: " + retrievedToken.getRefreshToken());
+        System.out.println("조회된 유저 ID: " + retrievedToken.getUserId());
+    }
     @Test
     void addDataToRedis() {
         // 새로운 RefreshToken 객체 생성

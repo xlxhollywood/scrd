@@ -32,58 +32,55 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        // "/error" 및 "/api/ssobbi/auth/"로 시작하는 요청은 JWT 검증 없이 필터를 통과시킴
         if (request.getRequestURI().startsWith("/error") ||
                 request.getRequestURI().startsWith("/scrd/auth/") ||
                 request.getRequestURI().startsWith("/scrd/every") ||
                 request.getRequestURI().equals("/")
         ) {
-            filterChain.doFilter(request, response);  // 여기가 올바르게 작동하고 있습니다.
-            return;  // 이 부분을 통해 바로 반환
+            filterChain.doFilter(request, response);
+            return;
         }
 
-            // HTTP 요청의 Authorization 헤더에서 JWT 토큰을 추출
+
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             // TODO: refresh token 헤더 검증
             String refreshToken = null;
-            // refreshToken = null이 아니거나, 비어있지 않다면 검증
+
             if (request.getHeader("X-Refresh-Token") != null && !request.getHeader("X-Refresh-Token").isEmpty()) {
                 // X-Refresh-Token 헤더에서 리프레시 토큰 값을 바로 가져옴
                 refreshToken = request.getHeader("X-Refresh-Token");
             }
 
 
-        // Header의 Authorization 값이 비어있으면 => Jwt Token을 전송하지 않음 => 로그인 하지 않음
             if (authorizationHeader == null) throw new DoNotLoginException();
 
-            // Header의 Authorization 값이 'Bearer '로 시작하지 않으면 => 잘못된 토큰
             if (!authorizationHeader.startsWith("Bearer "))
                 throw new WrongTokenException("Bearer 로 시작하지 않는 토큰입니다.");
-            // 전송받은 값에서 'Bearer ' 뒷부분(Jwt Token) 추출
-            String token = authorizationHeader.split(" ")[1];
 
-            // 헤어데 refresh token이 null일 경우 기존 로직대로 처리
+            String token = authorizationHeader.split(" ")[1];
+            System.out.println(refreshToken);
             if (refreshToken == null) {
                 User loginUser = authService.getLoginUser(JwtUtil.getUserId(token, SECRET_KEY));
-                // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
-                                loginUser.getId(), // 사용자 ID (식별자)
-                                null,  // 비밀번호는 null로 설정 (JWT로 이미 인증됨)
-                                List.of(new SimpleGrantedAuthority("USER"))); // 사용자의 권한 (여기서는 "USER")
+                                loginUser.getId(),
+                                null,
+                                List.of(new SimpleGrantedAuthority("USER")));
                 // 요청의 세부 정보를 설정 (예: IP 주소, 세션 ID 등)
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 // SecurityContextHolder에 인증 정보를 설정하여, 이후의 요청이 인증된 상태로 처리되도록 함
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
                 // 필터 체인의 다음 단계로 요청을 전달
                 filterChain.doFilter(request, response);
             }
             // TODO: 헤더에 access token ,refresh token 이 둘 다 있을 경우, access, refresh token을 둘 다 재발급해서 다음 필터로 넘겨준다.
             else {
+
+                System.out.println("refresh toekn 발급을 위한 로직으로 접어들었습니다.");
+
                 // TODO: refresh 토큰 검증 및 access/refresh 토큰 발급
                 List<String> newTokens = jwtUtil.validateRefreshToken(token, refreshToken, SECRET_KEY);
+
 
                 // TODO: 응답 헤더에 access token, refresh token을 심어준다.
                 response.setHeader("Authorization", "Bearer " + newTokens.get(0)); // Access Token

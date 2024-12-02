@@ -62,8 +62,8 @@ public class SecurityConfig {
         config.setAllowedOrigins(customProperties.getHostClient()); // 클라이언트 도메인
         // 허용할 HTTP 메서드 설정
         config.setAllowedMethods(Arrays.asList("POST", "GET", "PATCH", "DELETE", "PUT"));
-        // 요청에 허용할 헤더 설정 (Authorization, Content-Type 등)
-        config.setAllowedHeaders(Arrays.asList(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE));
+        // 요청에 허용할 헤더 설정 (Authorization, Content-Type, X-Refresh-Token 등)
+        config.setAllowedHeaders(Arrays.asList(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, "X-Refresh-Token"));
         // 노출할 헤더 설정 (클라이언트에서 접근 가능한 헤더)
         config.setExposedHeaders(Arrays.asList(HttpHeaders.AUTHORIZATION, "X-Refresh-Token"));
         // 인증 정보를 포함한 요청(Cookie 등)을 허용할지 여부 설정
@@ -74,6 +74,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config); // 모든 경로에 대해 설정 적용
         return source; // CORS 설정 반환
     }
+
 
 
 

@@ -77,9 +77,7 @@ public class JwtUtil {
 
     // TODO: 리프레시 토큰 검증 후, 리프레시/액세스 토큰 발급
     public List<String> validateRefreshToken(String token, String refreshToken, String secretKey) {
-
-        // TODO: 액세스 토큰 검증
-        extractClaims(token, secretKey);
+        System.out.println("validateRefreshToken 호출됨 ");
 
         // TODO: 리프레쉬 토큰으로 리프레시 토큰 조회 유효하지 않다면 exception 반환 WrongToken 받으면 프론트는 무조건 로그인 페이지로 보내야한다.
         RefreshToken storedRefreshToken = refreshTokenRepository.findById(refreshToken)
@@ -88,7 +86,6 @@ public class JwtUtil {
         // TODO: 유효하다면 리프레쉬 토큰 삭제 후 액세스 토큰 발급
         refreshTokenRepository.deleteById(refreshToken);
         Long userId = storedRefreshToken.getUserId();
-
         return this.createToken(userId, secretKey, EXPIRE_TIME_MS, EXPIRE_REFRESH_TIME_MS);
 
     }
