@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.scrd.domain.RefreshToken;
 import org.example.scrd.exception.WrongTokenException;
 import org.example.scrd.repo.RefreshTokenRepository;
+import org.example.scrd.service.RefreshTokenSearchService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class JwtUtil {
     private long EXPIRE_TIME_MS;
     @Value("${custom.jwt.refresh-expire-time-ms}") // JWT 만료 시간을 주입받음
     private long EXPIRE_REFRESH_TIME_MS;
-
+    private final RefreshTokenSearchService refreshTokenSearchService;
     public List<String> createToken(Long userId, String secretKey, long expireTimeMs, long expireRefreshTimeMs ) {
         // JWT의 payload에 해당하는 Claims에 데이터를 추가
         // Claim = JWT 토큰의 payload에 저장될 정보. 여기서는 userId를 저장함.
@@ -48,7 +49,7 @@ public class JwtUtil {
                 .compact();
 
         // TODO : Refresh Token Redis에 저장해야함
-        RefreshToken redis = new RefreshToken(refreshToken, userId);
+        RefreshToken redis = new RefreshToken(userId,refreshToken);
         refreshTokenRepository.save(redis);
 
         // 액세스, 리프레쉬가 들어가 있는 토큰 객체를 반환
@@ -76,16 +77,12 @@ public class JwtUtil {
     }
 
     // TODO: 리프레시 토큰 검증 후, 리프레시/액세스 토큰 발급
-    public List<String> validateRefreshToken(String token, String refreshToken, String secretKey) {
-        System.out.println("validateRefreshToken 호출됨 ");
+    public List<String> validateRefreshToken(String accessToken, String refreshToken, String secretKey) {
+        // TODO: 리프레쉬 토큰으로 리프레시 토큰 조회, 유효하지 않다면 exception 반환 WrongToken 받으면 프론트는 무조건 로그인 페이지로 보내야한다.
+        refreshTokenSearchService.validateRefreshToken(refreshToken);
 
-        // TODO: 리프레쉬 토큰으로 리프레시 토큰 조회 유효하지 않다면 exception 반환 WrongToken 받으면 프론트는 무조건 로그인 페이지로 보내야한다.
-        RefreshToken storedRefreshToken = refreshTokenRepository.findById(refreshToken)
-                .orElseThrow(() -> new WrongTokenException("유효하지 않은 리프레시 토큰입니다."));
-
-        // TODO: 유효하다면 리프레쉬 토큰 삭제 후 액세스 토큰 발급
-        refreshTokenRepository.deleteById(refreshToken);
-        Long userId = storedRefreshToken.getUserId();
+        // TODO: 유효하다면 리프레쉬 토큰 삭제 할 필요 없이 액세스 토큰이랑 리프레쉬 토큰 발급 어차피 key 값은 unique 이기에..
+        Long userId = getUserId(refreshToken,secretKey);
         return this.createToken(userId, secretKey, EXPIRE_TIME_MS, EXPIRE_REFRESH_TIME_MS);
 
     }

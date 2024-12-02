@@ -58,7 +58,6 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
                 throw new WrongTokenException("Bearer 로 시작하지 않는 토큰입니다.");
 
             String token = authorizationHeader.split(" ")[1];
-            System.out.println(refreshToken);
             if (refreshToken == null) {
                 User loginUser = authService.getLoginUser(JwtUtil.getUserId(token, SECRET_KEY));
                 UsernamePasswordAuthenticationToken authenticationToken =
@@ -80,7 +79,6 @@ public class JwtTokenFilter extends  OncePerRequestFilter{
 
                 // TODO: refresh 토큰 검증 및 access/refresh 토큰 발급
                 List<String> newTokens = jwtUtil.validateRefreshToken(token, refreshToken, SECRET_KEY);
-
 
                 // TODO: 응답 헤더에 access token, refresh token을 심어준다.
                 response.setHeader("Authorization", "Bearer " + newTokens.get(0)); // Access Token
